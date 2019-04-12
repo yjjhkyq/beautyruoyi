@@ -1,5 +1,6 @@
 import request from '@/utils/request'
-
+import { AddToken } from '@/utils/auth'
+import { addURLParam } from '@/utils/index'
 /**
  * 查询部门
  * @param {*} data 查询条件
@@ -607,6 +608,18 @@ export function updateMyInfo(data) {
 }
 
 /**
+ * 更新我的头像
+ * @param {*} data 用户
+ */
+export function updateMyAvatar(data) {
+  return request({
+    url: '/system/user/updateMyAvatar',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * 获取我的信息
  */
 export function myProfile() {
@@ -775,4 +788,22 @@ export function cleanSysJobLog() {
     url: '/monitor/jobLog/clean',
     method: 'post'
   })
+}
+
+/**
+ * 获取文件上传url
+ */
+export function getFileUploadUrl() {
+  return process.env.BASE_API + '/system/file/upload'
+}
+
+/**
+ * 获取文件下载url
+ * @param {*} fileId 文件id
+ */
+export function getFileDownloadUrl(fileId) {
+  if (fileId > 0) {
+    return  addURLParam(AddToken(process.env.BASE_API + '/system/file/download'), 'fileId', fileId)
+  }
+  return ''
 }

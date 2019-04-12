@@ -41,11 +41,7 @@
 
       <div class="tips">
         <span>{{ $t('login.username') }} : admin</span>
-        <span>{{ $t('login.password') }} : {{ $t('login.any') }}</span>
-      </div>
-      <div class="tips">
-        <span style="margin-right:18px;">{{ $t('login.username') }} : editor</span>
-        <span>{{ $t('login.password') }} : {{ $t('login.any') }}</span>
+        <span>{{ $t('login.password') }} : {{ 123456 }}</span>
       </div>
 
       <el-button class="thirdparty-button" type="primary" @click="showDialog=true">{{ $t('login.thirdparty') }}</el-button>
@@ -88,7 +84,7 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: 'admin123'
+        password: '123456'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],

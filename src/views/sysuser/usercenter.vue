@@ -1,10 +1,21 @@
 <template>
   <el-container v-loading="loading">
-    <el-aside width="200px">
+    <el-aside width="220px">
       <el-card>
         <div slot="header">
           <span>个人资料</span>
         </div>
+        <el-row>
+          <el-upload
+            :action="uploadUrl"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess"
+            :headers="headers"
+            class="avatar-uploader">
+            <img v-if="imageUrl" :src="imageUrl" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon"/>
+          </el-upload>
+        </el-row>
         <el-row>
           <el-col>
             <span>登录名称：</span>
@@ -103,14 +114,18 @@
   </el-container>
 </template>
 <script>
-import { changeSysUserPwd, myProfile, updateMyInfo } from '@/api/system'
+import { changeSysUserPwd, myProfile, updateMyInfo, getFileUploadUrl, getFileDownloadUrl, updateMyAvatar } from '@/api/system'
+import { getTokenHeader } from '@/utils/auth'
 export default {
   name: 'UserCenter',
   data() {
     return {
       loading: false,
       postNames: '',
-      userInfo: null,
+      userInfo: { dept: {}},
+      uploadUrl: getFileUploadUrl(),
+      headers: { ...getTokenHeader() },
+      imageUrl: '',
       changeMyPwdModel: { oldPassword: '', newPassword: '', confirmPwd: '' },
       updateMyInfoRules: {
         userName: [
@@ -141,6 +156,8 @@ export default {
     myProfile().then(res => {
       this.loading = false
       this.userInfo = res.data
+      this.imageUrl = getFileDownloadUrl(this.userInfo.avatar)
+      console.log(this.imageUrl)
     }).catch(ex => {
       this.loading = false
     })
@@ -175,7 +192,45 @@ export default {
           })
         }
       })
+    },
+    handleAvatarSuccess(response) {
+      console.log(response.data + 'file id')
+      this.loading = true
+      this.userInfo.avatar = response.data
+      this.imageUrl = getFileDownloadUrl(response.data)
+      if (this.userInfo.userId > 0) {
+        updateMyAvatar(this.userInfo).then(res => {
+          this.loading = false
+        }).catch(ex => {
+          this.loading = false
+        })
+      }
     }
   }
 }
 </script>
+<style>
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
+</style>
